@@ -52,6 +52,7 @@ export default class GetPricesRequest extends Request<GetPricesResponse> {
                     price: usd['PRICE'],
                     dailyChangePercentage: usd['CHANGEPCTDAY'],
                     imagePath: `https://www.cryptocompare.com${usd['IMAGEURL']}`,
+                    historicalData: undefined,
                 };
             });
 

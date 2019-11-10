@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import GetPricesRequest from './src/api/GetPricesRequest';
+import GetHistoryRequest, { TimeBreakdown } from './src/api/GetHistoryRequest';
 import CryptoType from './src/model/CryptoType';
 import CryptoData from './src/model/CryptoData';
 
@@ -71,7 +72,7 @@ export default class App extends React.Component<{}, State> {
             detailOpacity: new Animated.Value(1.0),
             detailYOffset: new Animated.Value(0.0),
 
-            graphTargetData: [0.9, 0.4, 0.7, 0.0, 0.5, 1.0, 0.1, 0.9, 0.4, 0.7],
+            graphTargetData: [0.0, 0.4, 0.7, 0.0, 0.5, 1.0, 0.1, 0.9, 0.4, 0.7],
         };
     }
     
@@ -82,10 +83,15 @@ export default class App extends React.Component<{}, State> {
             CryptoType.Litecoin,
             CryptoType.BitcoinCash,
         ]);
+
+        // const ghr = new GetHistoryRequest(CryptoType.Bitcoin, 15);
         
         try {
             const response = await request.start();
             this.setState({ currencyData: response.currencies });
+
+            // const res = await ghr.start();
+            // alert(JSON.stringify(res, null, 2));
             // this.setState({ currencyData: TestData });
         } catch (error) {
             Alert.alert('API Error', `${error}`, [
@@ -96,6 +102,20 @@ export default class App extends React.Component<{}, State> {
 
     private onPagerIndexChanged(index: number, prevIndex: number) {
         if (index !== prevIndex) {
+            const currency = this.state.currencyData[index];
+            if (currency.historicalData == undefined) {
+                const request = new GetHistoryRequest(currency.type, TimeBreakdown.Minute, 7);
+                request.start().then((response) => {
+                    const newCurrencyData = [...this.state.currencyData];
+                    newCurrencyData[index] = {
+                        ...currency,
+                        historicalData: response.data,
+                    };
+
+                    this.setState({ currencyData: newCurrencyData });
+                });
+            }
+
             this.setState({
                 graphTargetData: this.state.graphTargetData.map(_ => Math.random()),
             }, () => {
@@ -105,7 +125,6 @@ export default class App extends React.Component<{}, State> {
                 graphAnim.start();
 
                 Animated.parallel([
-                    // graphAnim,
                     ...detailAnims,
                 ]).start(() => {
                     this.setState({ currentIndex: index }, () => {

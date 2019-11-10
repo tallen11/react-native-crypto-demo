@@ -32,12 +32,22 @@ export default class CryptoPagerItem extends React.PureComponent<Props, State> {
 
     static widthPercentage = 0.85;
 
+    private graphRef: any;
+
     constructor(props: Props) {
         super(props);
+
+        this.graphRef = React.createRef();
 
         this.state = {
             graphTargetData: [0.9, 0.4, 0.7, 0.0, 0.5, 1.0, 0.1],
         };
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.currency !== this.props.currency) {
+            this.graphRef.getAnimation().start();
+        }
     }
 
     private formatUSD(amount: number): string {
@@ -76,10 +86,11 @@ export default class CryptoPagerItem extends React.PureComponent<Props, State> {
 
                         <View style={Styles.graphContainer}>
                             <Graph
+                                ref={(c: any) => this.graphRef = c}
                                 color={'white'}
                                 width={Dimensions.get('window').width * CryptoPagerItem.widthPercentage}
                                 height={95.0}
-                                targetData={this.state.graphTargetData} />
+                                targetData={this.props.currency.historicalData || [0,0,0,0,0,0,0]} />
                         </View>
                     </LinearGradient>
                 </View>

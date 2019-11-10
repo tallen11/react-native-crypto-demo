@@ -6,4 +6,5 @@ export default interface CryptoData {
     readonly price: number;
     readonly dailyChangePercentage: number;
     readonly imagePath: string;
+    readonly historicalData?: number[];
 }
