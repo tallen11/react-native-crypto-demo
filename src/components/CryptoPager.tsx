@@ -61,7 +61,8 @@ export default class CryptoPager extends React.PureComponent<Props, State> {
                     snapToInterval={Dimensions.get('window').width}
                     snapToAlignment={'center'}
                     showsHorizontalScrollIndicator={false}
-                    onMomentumScrollEnd={this.onScroll.bind(this)}>
+                    onMomentumScrollEnd={this.onScroll.bind(this)}
+                    disableIntervalMomentum>
                     {this.props.currencies.map((c, i) => <CryptoPagerItem
                                                                 key={c.name}
                                                                 currency={c}
